@@ -102,6 +102,9 @@ async function evaluateFact(
 			return userHasBP;
 		},
 		then: (fact: UserClinicalInformaation) => {
+			if (!fact.forms) {
+				fact.forms = [];
+			}
 			fact.forms.push('BP');
 		},
 	});
