@@ -5,7 +5,6 @@ import { UserClinicalInformaation } from './types/UserClinicalInformaation.type'
 // const prisma = new PrismaClient();
 
 async function main() {
-	// await executeSample();
 	await executeDiseaseUsecase();
 }
 
@@ -19,87 +18,27 @@ main()
 		process.exit(1);
 	});
 
-async function executeSample() {
-	// import
-	const { Rools, Rule } = require('rools');
-
-	// facts
-	const facts = {
-		user: {
-			name: 'frank',
-			stars: 347,
-		},
-		weather: {
-			temperature: 20,
-			windy: true,
-			rainy: false,
-		},
-	};
-
-	// rules
-	const ruleMoodGreat = new Rule({
-		name: 'mood is great if 200 stars or more',
-		when: (facts: any) => facts.user.stars >= 200,
-		then: (facts: any) => {
-			facts.user.mood = 'great';
-		},
-	});
-
-	const ruleGoWalking = new Rule({
-		name: 'go for a walk if mood is great and the weather is fine',
-		when: [
-			(facts: any) => facts.user.mood === 'great',
-			(facts: any) => facts.weather.temperature >= 20,
-			(facts: any) => !facts.weather.rainy,
-		],
-		then: (facts: any) => {
-			facts.goWalking = true;
-		},
-	});
-
-	// evaluation
-	const rools = new Rools();
-	await rools.register([ruleMoodGreat, ruleGoWalking]);
-	const temp = await rools.evaluate(facts);
-
-	console.dir(temp, {
-		depth: null,
-	});
-
-	console.log('\n===================\n');
-
-	console.dir(facts, {
-		depth: null,
-	});
-}
-
 async function executeDiseaseUsecase() {
-	// import
-	const { Rools, Rule } = require('rools');
-
 	// facts
 	const facts: UserClinicalInformaation[] = require('./facts.json');
 
-	const rools = new Rools();
+	const promises = facts.map(async (fact) => await evaluateFact(fact));
 
-	for (const fact of facts) {
-		await evaluateFact(Rule, rools, fact);
-	}
+	const evaluations = await Promise.all(promises);
 }
 
-async function evaluateFact(
-	Rule: any,
-	rools: any,
-	fact: UserClinicalInformaation
-) {
+async function evaluateFact(fact: UserClinicalInformaation) {
+	// import
+	const { Rools, Rule } = require('rools');
+	const rools = new Rools();
 	const ruleFormProvidedShouldBeOfBloodPressure = new Rule({
 		name: 'form subitted is for BP, if user has BP',
 		when: (fact: UserClinicalInformaation) => {
-			const userHasBP =
-				fact.clinicalInfo.diseases.filter((disease) => disease.name == 'BP')
-					.length > 0;
+			const userHasBP = fact.clinicalInfo.diseases.find(
+				(disease) => disease.name == 'BP'
+			);
 
-			return userHasBP;
+			return !!userHasBP;
 		},
 		then: (fact: UserClinicalInformaation) => {
 			if (!fact.forms) {
@@ -111,6 +50,25 @@ async function evaluateFact(
 
 	await rools.register([ruleFormProvidedShouldBeOfBloodPressure]);
 
+	const ruleFormProvidedShouldBeOfDiabetes = new Rule({
+		name: 'form subitted is for diabetes, if user has diabetes',
+		when: (fact: UserClinicalInformaation) => {
+			const userHasDiabetes = fact.clinicalInfo.diseases.find(
+				(disease) => disease.name == 'diabetes'
+			);
+
+			return !!userHasDiabetes;
+		},
+		then: (fact: UserClinicalInformaation) => {
+			if (!fact.forms) {
+				fact.forms = [];
+			}
+			fact.forms.push('diabetes');
+		},
+	});
+
+	await rools.register([ruleFormProvidedShouldBeOfDiabetes]);
+
 	const temp = await rools.evaluate(fact);
 	console.dir(temp, {
 		depth: null,
@@ -119,4 +77,6 @@ async function evaluateFact(
 	console.dir(fact, {
 		depth: null,
 	});
+
+	return fact;
 }

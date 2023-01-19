@@ -1,36 +1,58 @@
-# node-prisma-musics-app
+# temp
 
-1. create 5 accounts
-2. Out of those 5 accounts, 3 of them will be artists
-3. For every artist create 2 podcast and podcast will have 2-5 episodes
-4. create 2-3 `Audiobook`
-5. create 2-3 audio playlist, and some of those playlist will have followers
-6. in the `single` table, `artistNameInfo` should be optional (here you will need to add extra migration to existing migrations)
-7. now with step-6 in place, create some of `single` records without referencing to `Album` table and some referencing to `Album` table
-8. fetch the data as per following requirements
-       
-    *. get the list of playlists created and folloed by every user
+```
 
-    *. get the information of Podcast and episodes in it
+async function executeSample() {
+	// import
+	const { Rools, Rule } = require('rools');
 
-    *. get the list of singles which do not have Album and list of singles which have album => this list should be divided into 2 groups
-       
-        {
-            "withAlbum": [],
-            "withoutAlbum": [],
-        }
-        
-    *. get the list of albums and audiobooks and podcasts created in same studio
+	// facts
+	const facts = {
+		user: {
+			name: 'frank',
+			stars: 347,
+		},
+		weather: {
+			temperature: 20,
+			windy: true,
+			rainy: false,
+		},
+	};
 
-    *. get the list of singles which were released before and after may-2022
-      
-        {
-            "before": [],
-            "after": [],
-        }
+	// rules
+	const ruleMoodGreat = new Rule({
+		name: 'mood is great if 200 stars or more',
+		when: (facts: any) => facts.user.stars >= 200,
+		then: (facts: any) => {
+			facts.user.mood = 'great';
+		},
+	});
 
-    *. group Podcasts/Audiobook/Single/Album by artist and sort the list by artist's firstname
+	const ruleGoWalking = new Rule({
+		name: 'go for a walk if mood is great and the weather is fine',
+		when: [
+			(facts: any) => facts.user.mood === 'great',
+			(facts: any) => facts.weather.temperature >= 20,
+			(facts: any) => !facts.weather.rainy,
+		],
+		then: (facts: any) => {
+			facts.goWalking = true;
+		},
+	});
 
-    *. Update 2 user's email and phone        
+	// evaluation
+	const rools = new Rools();
+	await rools.register([ruleMoodGreat, ruleGoWalking]);
+	const temp = await rools.evaluate(facts);
 
-9. at last out of 5 accounts delete 2 accounts (soft-delete only)
+	console.dir(temp, {
+		depth: null,
+	});
+
+	console.log('\n===================\n');
+
+	console.dir(facts, {
+		depth: null,
+	});
+}
+```
