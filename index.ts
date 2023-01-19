@@ -25,6 +25,8 @@ async function executeDiseaseUsecase() {
 	const promises = facts.map(async (fact) => await evaluateFact(fact));
 
 	const evaluations = await Promise.all(promises);
+
+	fs.writeFileSync('./evaluations.json', JSON.stringify(evaluations));
 }
 
 async function evaluateFact(fact: UserClinicalInformaation) {
