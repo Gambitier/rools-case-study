@@ -1,0 +1,38 @@
+[
+	{
+		"userInfo": {
+			"firstName": "akash",
+			"lastName": "jadhav",
+			"age": 27
+		},
+		"clinicalInfo": {
+			"diseases": [
+				{ "name": "diabetes", "firstDiagnosisOn": "2003-01-15" },
+				{ "name": "BP", "firstDiagnosisOn": "2013-11-18" }
+			]
+		}
+	},
+	{
+		"userInfo": {
+			"firstName": "ashish",
+			"lastName": "patil",
+			"age": 29
+		},
+		"clinicalInfo": {
+			"diseases": [
+				{ "name": "diabetes", "firstDiagnosisOn": "2013-11-15" },
+				{ "name": "polio", "firstDiagnosisOn": "2019-11-13" }
+			]
+		}
+	},
+	{
+		"userInfo": {
+			"firstName": "john",
+			"lastName": "doe",
+			"age": 37
+		},
+		"clinicalInfo": {
+			"diseases": [{ "name": "diabetes", "firstDiagnosisOn": "2023-01-05" }]
+		}
+	}
+]
